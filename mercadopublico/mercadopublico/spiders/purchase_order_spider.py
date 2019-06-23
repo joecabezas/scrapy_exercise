@@ -22,4 +22,10 @@ class PurchaseOrderSpider(scrapy.Spider):
         )
 
     def get_results(self, response):
-        print('>>>' + response.xpath('//*[@id="rptResultados_ctl01_lblNombre"]').get())
+        order_selectors = response.xpath('//tr[contains(@class, "cssGridAdvancedSearch")]/td[1]/a/@onclick')
+        results = []
+        for order_selector in order_selectors:
+            order_relative_url = order_selector.re(r"open\('(.+?)'")[0]
+            order_absolute_url = response.urljoin(order_relative_url)
+            results.append(order_absolute_url)
+        yield {"links":results}
